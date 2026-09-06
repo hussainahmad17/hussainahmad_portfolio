@@ -38,15 +38,49 @@ export const site: SiteConfig = {
   url: "https://hussainahmad.dev",
 };
 
-/** Canonical origin, environment-aware. Never hard-codes localhost into output. */
-export const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_ENV === "production" && process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : site.url)
-).replace(/\/$/, "");
+/**
+ * Normalises a candidate origin.
+ *
+ * Returns null for anything unusable — unset, empty, whitespace, or not a
+ * parseable URL. An environment variable that exists but is blank is the
+ * common case (`??` does not catch it), and it must not reach `new URL()`.
+ *
+ * Vercel supplies host names without a scheme, so one is added when missing.
+ * `origin` is returned rather than the raw string, which drops any path and
+ * trailing slash in one step.
+ */
+function normaliseOrigin(value: string | undefined): string | null {
+  const trimmed = value?.trim();
+  if (!trimmed) return null;
+
+  const withScheme = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+
+  try {
+    return new URL(withScheme).origin;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Canonical origin, environment-aware.
+ *
+ * Order: an explicit NEXT_PUBLIC_SITE_URL wins; then the deployment URL Vercel
+ * provides (the stable production domain for production builds, the ephemeral
+ * deployment URL otherwise); then the configured fallback above. Every step is
+ * validated, so this is always a usable absolute origin and never an empty
+ * string — which would break `metadataBase`, the sitemap and robots.txt.
+ */
+const vercelOrigin =
+  process.env.VERCEL_ENV === "production"
+    ? process.env.VERCEL_PROJECT_PRODUCTION_URL
+    : process.env.VERCEL_URL;
+
+export const siteUrl =
+  normaliseOrigin(process.env.NEXT_PUBLIC_SITE_URL) ??
+  normaliseOrigin(vercelOrigin) ??
+  normaliseOrigin(site.url) ??
+  "https://example.com";
 
 export const navigation = [
   { label: "Work", href: "/work" },

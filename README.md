@@ -1,6 +1,8 @@
 # Hussain Ahmad — AI Software Engineer
 
-Personal portfolio. Next.js 16 (App Router), React 19, TypeScript in strict mode, Tailwind CSS v4, Motion, MDX. Built to deploy on Vercel.
+Personal portfolio. Next.js 16 (App Router), React 19, TypeScript in strict mode, Tailwind CSS v4, MDX. Built to deploy on Vercel.
+
+Statically prerendered end to end, with four client components and no animation library — scroll reveals and the hero schematic are CSS.
 
 **Live:** _set `NEXT_PUBLIC_SITE_URL` once a domain is attached_
 
@@ -108,7 +110,7 @@ src/
   types/                  content types
 ```
 
-Server Components by default. Only five components are client components: the header (menu state), the reveal wrapper, the hero diagram, the contact form, and the error boundary.
+Server Components by default. Only four are client components: the header (menu state), the reveal wrapper, the contact form, and the error boundary. The hero and architecture diagrams are server-rendered and animate in CSS.
 
 ---
 
@@ -146,14 +148,20 @@ Copy `.env.example` to `.env.local` locally, and set the same keys in Vercel.
 
 | Variable | Required | Purpose |
 | --- | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | Production | Canonical origin for canonical tags, sitemap, robots and Open Graph. No trailing slash. |
+| `NEXT_PUBLIC_SITE_URL` | Recommended in Production | Canonical origin for canonical tags, sitemap, robots and Open Graph. Falls back safely when absent — see below. |
 | `RESEND_API_KEY` | For email | API key from [resend.com](https://resend.com). |
 | `RESEND_FROM_EMAIL` | For email | Verified sender address. |
 | `CONTACT_TO_EMAIL` | For email | Inbox that receives contact-form messages. |
 
 **If the email variables are absent, nothing pretends to work.** The API route logs a clear server-side error and returns `503`; the form shows the failure and offers a direct email link instead. It never reports success for a message that was not sent.
 
-`NEXT_PUBLIC_SITE_URL` is optional on preview deployments — the app falls back to Vercel's deployment URL, then to `site.url`.
+`NEXT_PUBLIC_SITE_URL` is optional everywhere. Resolution order, with every step validated:
+
+1. `NEXT_PUBLIC_SITE_URL`, if set to something parseable
+2. Vercel's deployment URL — the stable production domain on production builds, the ephemeral deployment URL otherwise
+3. `site.url` in `src/data/site.ts`
+
+A value that is empty, whitespace, missing its scheme, or has a trailing slash or path is handled rather than trusted: blank and unparseable values fall through to the next step, and valid ones are reduced to a bare origin. The resolved value is therefore always a usable absolute URL, which `metadataBase`, the sitemap and `robots.txt` all require.
 
 ---
 
@@ -239,6 +247,7 @@ vercel --prod    # production
 | --- | --- |
 | Build fails on a type error | Type errors deliberately fail the build. Run `npm run typecheck` locally. Never set `typescript.ignoreBuildErrors`. |
 | Canonical URLs show the wrong domain | `NEXT_PUBLIC_SITE_URL` is unset or stale. Set it and **redeploy** — it is inlined at build time. |
+| `TypeError: Invalid URL` during `Collecting page data` | An environment variable exists but is empty. Fixed in `src/data/site.ts`: blank and unparseable origins now fall through to the next candidate instead of reaching `new URL()`. If you see this again, a *different* `new URL()` call is being handed an unvalidated value. |
 | Contact form returns 503 | Email is not configured. Set all three Resend variables and redeploy. |
 | Contact form returns 502 | Resend rejected the message — usually an unverified sender domain. Check `RESEND_FROM_EMAIL`. |
 | Site is not being indexed | Preview deployments block crawlers by design. Confirm you are checking the production domain. |
@@ -271,7 +280,7 @@ To rebrand, change the tokens. Nothing downstream hard-codes a colour.
 
 Accessibility choices that are load-bearing:
 
-- `prefers-reduced-motion` is honoured globally in CSS *and* through `useReducedMotion` in every animated component
+- `prefers-reduced-motion` is honoured in CSS in one place: reveals become immediately visible and the hero flow animation is removed entirely
 - Visible focus rings via `:focus-visible`, with a skip link to `#main`
 - The architecture diagrams are real DOM, not images: they scale with font size and are readable by a screen reader as an ordered list of layers
 - Form fields have real labels, `aria-invalid`, and errors tied by `aria-describedby`
