@@ -36,7 +36,7 @@ Nothing on this site is invented. Every claim traces back to a public repository
 - **Phone:** `[REQUIRED — optional]` — leave blank if you would rather not publish one.
 - **LinkedIn:** https://www.linkedin.com/in/hussainahmaddev/
 - **GitHub:** https://github.com/hussainahmad17
-- **Production domain:** `[REQUIRED]` — e.g. `https://hussainahmad.dev`. Used for canonical URLs, sitemap and Open Graph. Set as `NEXT_PUBLIC_SITE_URL` in Vercel.
+- **Production domain:** `[CONFIRM]` — currently `https://hussainahmad.me`, taken from the value you committed to `.env.example`. This is the fallback in `src/data/site.ts`. **`.env.example` is documentation only — Vercel never reads it.** To make it authoritative, set `NEXT_PUBLIC_SITE_URL` in Vercel's dashboard and redeploy.
 - **Availability:** `[CONFIRM]` — currently: "Open to AI engineering roles and freelance work." Set to `null` in `src/data/site.ts` to hide the availability pill.
 - **Timezone:** `[CONFIRM]` — currently PKT (UTC+5).
 - **X / Twitter:** `[REQUIRED — optional]` — omitted from the site while blank.

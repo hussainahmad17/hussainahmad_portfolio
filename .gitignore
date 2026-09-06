@@ -33,7 +33,6 @@ yarn-error.log*
 # env files — never commit real secrets.
 # .env.example is checked in on purpose: it documents required variables and
 # contains no values.
-.env*
 !.env.example
 
 # vercel
@@ -42,3 +41,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+config.bat
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
