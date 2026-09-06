@@ -34,8 +34,9 @@ export const site: SiteConfig = {
 
   availability: "Open to AI engineering roles and freelance work",
 
-  // Overridden by NEXT_PUBLIC_SITE_URL in production.
-  url: "https://hussainahmad.dev",
+  // Fallback origin, used when NEXT_PUBLIC_SITE_URL and the Vercel-provided
+  // deployment URL are both unavailable. Overridden by NEXT_PUBLIC_SITE_URL.
+  url: "https://hussainahmad.me",
 };
 
 /**
