@@ -1,0 +1,309 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------
+   Design tokens
+
+   A near-black canvas with a single mint-signal accent. The accent is
+   used for state and emphasis only — never as decoration — so that when
+   it appears it means something.
+   ------------------------------------------------------------------ */
+
+@theme {
+  --color-canvas: #08090b;
+  --color-surface: #0d0f13;
+  --color-surface-2: #12151a;
+  --color-surface-3: #171b21;
+
+  --color-line: #1e232b;
+  --color-line-strong: #2a3039;
+
+  --color-ink: #eceef1;
+  --color-ink-soft: #b7bdc7;
+  --color-muted: #868e9b;
+  --color-faint: #5b636f;
+
+  --color-accent: #5ef2c0;
+  --color-accent-soft: #9df7d9;
+  --color-accent-dim: #1b3d33;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
+
+  --text-display: clamp(2.5rem, 1.5rem + 3.3vw, 4.5rem);
+  --text-h1: clamp(2.125rem, 1.5rem + 2.1vw, 3.375rem);
+  --text-h2: clamp(1.625rem, 1.25rem + 1.5vw, 2.375rem);
+  --text-h3: clamp(1.1875rem, 1.05rem + 0.55vw, 1.5rem);
+
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ------------------------------------------------------------------
+   Base
+   ------------------------------------------------------------------ */
+
+@layer base {
+  * {
+    border-color: var(--color-line);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-canvas);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* The browser default focus ring is removed only where :focus-visible applies. */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+    letter-spacing: -0.022em;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Utilities
+   ------------------------------------------------------------------ */
+
+@utility container-page {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 78rem;
+  padding-inline: 1.25rem;
+
+  @media (width >= 40rem) {
+    padding-inline: 2rem;
+  }
+
+  @media (width >= 80rem) {
+    padding-inline: 2.5rem;
+  }
+}
+
+@utility text-balance-tight {
+  text-wrap: balance;
+  letter-spacing: -0.03em;
+}
+
+/* Small uppercase label used to head every section. */
+@utility eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+@utility surface-card {
+  background-color: color-mix(in oklab, var(--color-surface) 92%, transparent);
+  border: 1px solid var(--color-line);
+  border-radius: 1rem;
+}
+
+/* Hairline grid backdrop. Purely structural, very low contrast. */
+@utility grid-backdrop {
+  background-image:
+    linear-gradient(to right, var(--color-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-line) 1px, transparent 1px);
+  background-size: 4.5rem 4.5rem;
+  opacity: 0.32;
+}
+
+@utility accent-glow {
+  background: radial-gradient(
+    60% 60% at 50% 40%,
+    color-mix(in oklab, var(--color-accent) 16%, transparent) 0%,
+    transparent 70%
+  );
+}
+
+/* ------------------------------------------------------------------
+   Long-form article typography (MDX)
+   ------------------------------------------------------------------ */
+
+@layer components {
+  .prose-article {
+    color: var(--color-ink-soft);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+
+  .prose-article h2 {
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+    font-size: var(--text-h3);
+    font-weight: 500;
+    color: var(--color-ink);
+  }
+
+  .prose-article h3 {
+    margin-top: 2.25rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--color-ink);
+  }
+
+  .prose-article p,
+  .prose-article ul,
+  .prose-article ol {
+    margin-bottom: 1.25rem;
+  }
+
+  .prose-article ul,
+  .prose-article ol {
+    padding-left: 1.25rem;
+  }
+
+  .prose-article ul {
+    list-style: disc;
+  }
+
+  .prose-article ol {
+    list-style: decimal;
+  }
+
+  .prose-article li {
+    margin-bottom: 0.5rem;
+  }
+
+  .prose-article a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .prose-article code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    background-color: var(--color-surface-2);
+    border: 1px solid var(--color-line);
+    border-radius: 0.3rem;
+    padding: 0.1rem 0.35rem;
+  }
+
+  .prose-article pre {
+    overflow-x: auto;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .prose-article pre code {
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  .prose-article blockquote {
+    border-left: 2px solid var(--color-accent);
+    padding-left: 1rem;
+    color: var(--color-ink);
+    margin-bottom: 1.25rem;
+  }
+
+  /* ----------------------------------------------------------------
+     Scroll reveal
+
+     An IntersectionObserver adds `.is-visible`; the transition is CSS.
+     Under reduced motion the element is simply always visible.
+     ---------------------------------------------------------------- */
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 0.55s var(--ease-out-quint),
+      transform 0.55s var(--ease-out-quint);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ----------------------------------------------------------------
+     Hero schematic flow
+
+     A pure CSS keyframe, so the hero diagram ships no JavaScript.
+     ---------------------------------------------------------------- */
+
+  .hero-flow path {
+    stroke-dasharray: 14 120;
+    animation: hero-flow 3.6s linear infinite;
+  }
+}
+
+@keyframes hero-flow {
+  from {
+    stroke-dashoffset: 134;
+  }
+  to {
+    stroke-dashoffset: -134;
+  }
+}
+
+
+/* ------------------------------------------------------------------
+   Reduced motion — honoured globally, not per component
+   ------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  .hero-flow {
+    display: none;
+  }
+}
